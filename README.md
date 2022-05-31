@@ -33,3 +33,6 @@ whats mapped ...
 `e,b` : goto next /previous word
 
 `i,a` : go back to julia-mode
+
+`j,k` dont do prefix completions .
+`j,k` scroll up and down asthough the lines in history were the lines in a vim buffer.
