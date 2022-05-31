@@ -30,6 +30,6 @@ whats mapped ...
 
 `de` , 'db' : delete next / previous word
 
-`b,f` : goto next /previous word
+`b,e` : goto next /previous word
 
 `i,a` : go back to julia-mode
