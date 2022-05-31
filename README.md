@@ -1,5 +1,5 @@
 # julia-vim-repl
-a vi like repl for julia
+vi like repl bindings for julia-repl
 
 Very barebones emulation of vim, probably always will be ... but ateast you dont 
 have to ctl-p to go through history. 
