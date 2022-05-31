@@ -4,7 +4,7 @@ vi like repl bindings for julia-repl
 Very barebones emulation of vim, probably always will be ... but ateast you dont 
 have to ctl-p to go through history. 
 
-you have to hit `esc` twice to get into vi mode
+* You have to hit `esc` **twice** to get into vi mode 
 
 `h,j,k,l` work as expected.
 
