@@ -23,8 +23,13 @@ Built on [RepLMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a mino
 LineEdit.
 
 whats mapped ...
-'h,j,k,l' : navigation
-'dd' : clear line
-'de' , 'db' : delete next / previous word
-'b,f' : goto next /previous word
-'i,a' : go back to julia-mode
+
+`h,j,k,l` : navigation 
+
+`dd` : clear line
+
+`de` , 'db' : delete next / previous word
+
+`b,f` : goto next /previous word
+
+`i,a` : go back to julia-mode
