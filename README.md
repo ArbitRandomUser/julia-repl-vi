@@ -28,8 +28,8 @@ whats mapped ...
 
 `dd` : clear line
 
-`de` , 'db' : delete next / previous word
+`de,db` : delete next / previous word
 
-`b,e` : goto next /previous word
+`e,b` : goto next /previous word
 
 `i,a` : go back to julia-mode
