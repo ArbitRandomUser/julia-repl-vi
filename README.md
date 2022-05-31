@@ -21,3 +21,10 @@ If you want to try this out , get `start.jl` and run it with (`include("start.jl
 
 Built on [RepLMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on 
 LineEdit.
+
+whats mapped ...
+'h,j,k,l' : navigation
+'dd' : clear line
+'de' , 'db' : delete next / previous word
+'b,f' : goto next /previous word
+'i,a' : go back to julia-mode
