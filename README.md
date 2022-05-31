@@ -1,4 +1,4 @@
-# julia-vim-repl
+# julia-repl-vi
 vi like repl bindings for julia-repl
 
 Very barebones emulation of vim, probably always will be ... but ateast you dont 
