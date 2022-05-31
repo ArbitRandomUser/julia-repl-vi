@@ -41,7 +41,7 @@ vim_norm_nav_keymap = AnyDict([
     "db" => (s::MIState,o...)->edit_werase(s),
     #navigate words
     "b" => (s::MIState,o...)->edit_move_word_left(s),
-    "f" => (s::MIState,o...)->edit_move_word_right(s),
+    "e" => (s::MIState,o...)->edit_move_word_right(s),
     "u" => (s::MIState,o...)->edit_undo!(s),
     #"k" => (s::MIState,o...)->edit_move_up(s),
     #"j" => (s::MIState,o...)->edit_move_down(s),
