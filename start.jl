@@ -2,7 +2,9 @@ using ReplMaker
 import REPL
 import REPL.LineEdit
 import Base
-import REPL.LineEdit: edit_werase,edit_delete_next_word,on_enter,edit_move_word_left,edit_move_word_right,edit_undo!,commit_line,edit_move_right,edit_move_left,edit_move_up,edit_kill_region, mode, MIState, transition,AnyDict
+#using REPL.LineEdit
+#import REPL.LineEdit : *
+import REPL.LineEdit:keymap,prefix_history_keymap,HistoryProvider,Prompt,prefix_history_keymap,setup_prefix_keymap,history_prev_prefix,history_next_prefix,copybuf!,state,buffer,PrefixHistoryPrompt,enter_prefix_search,ModeState, edit_werase,edit_delete_next_word,on_enter,edit_move_word_left,edit_move_word_right,edit_undo!,commit_line,edit_move_right,edit_move_left,edit_move_up,edit_kill_region, mode, MIState, transition,AnyDict
 #LineEdit = REPL.LineEdit
 #mode = LineEdit.mode
 #MIState = LineEdit.MIState
@@ -24,14 +26,14 @@ julia_prompt.keymap_dict =
 
 vim_norm_nav_keymap = AnyDict([
     #nav
-    'k' =>
-        (s::MIState, o...) -> (
-            LineEdit.edit_move_up(s) || LineEdit.history_prev(s, LineEdit.mode(s).hist)
-        ),
-    'j' =>
-        (s::MIState, o...) -> (
-            LineEdit.edit_move_down(s) || LineEdit.history_next(s, LineEdit.mode(s).hist)
-        ),
+    #'k' =>
+    # (s::MIState, o...) -> (
+    #            edit_move_up(s) || LineEdit.history_prev(s, LineEdit.mode(s).hist)
+    #    ),
+    #'j' =>
+    #  (s::MIState, o...) -> (
+    #            edit_move_down(s) || LineEdit.history_next(s, LineEdit.mode(s).hist)
+    #    ),
     'h' => (s::MIState,o...)->edit_move_left(s),
     'l' => (s::MIState,o...)->edit_move_right(s),
     #delete line
@@ -45,14 +47,26 @@ vim_norm_nav_keymap = AnyDict([
     "u" => (s::MIState,o...)->edit_undo!(s),
     #"k" => (s::MIState,o...)->edit_move_up(s),
     #"j" => (s::MIState,o...)->edit_move_down(s),
-    '\r' => (s::MIState,o...)->begin
-        if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
-            commit_line(s)
-            return :done
-        else
-            edit_insert_newline(s)
+    #'\r' => (s::MIState,o...)->begin
+    #    if on_enter(s) || (eof(buffer(s)) && s.key_repeats > 1)
+    #        commit_line(s)
+    #        return :done
+    #    else
+    #        edit_insert_newline(s)
+    #    end
+    #end,
+    #'\r' => (s::MIState,o...)->begin
+    #        commit_line(s)
+    #        return :done
+    #    end,
+    
+    # on enter goto julia mode
+    '\r' => function (s::MIState, o...)
+        buf = copy(LineEdit.buffer(s))
+        transition(s, julia_prompt) do
+            LineEdit.state(s, julia_prompt).input_buffer = buf
         end
-    end,
+        end,
 
     #back to julia_prompt
     'i' => function (s::MIState, o...)
@@ -80,7 +94,49 @@ vim_prompt = initrepl(
     valid_input_checker= REPL.return_callback
 )
 
-vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap]), vim_norm_nav_keymap)
+const vi_prefix_history_keymap = merge!(
+    AnyDict(
+        'k' => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
+        'j' => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
+        # Up Arrow
+        "\e[A" => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
+        # Down Arrow
+        "\e[B" => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
+        # by default, pass through to the parent mode
+        # match escape sequences for pass through
+    ),
+    vim_norm_nav_keymap,
+    # VT220 editing commands
+    #AnyDict("\e[$(n)~" => "*" for n in 1:8),
+    ## set mode commands
+    #AnyDict("\e[$(c)h" => "*" for c in 1:20),
+    ## reset mode commands
+    #AnyDict("\e[$(c)l" => "*" for c in 1:20)
+)
+function setup_prefix_keymap_vi(hp::HistoryProvider, parent_prompt::Prompt)
+    p = PrefixHistoryPrompt(hp, parent_prompt)
+    p.keymap_dict = LineEdit.keymap([vi_prefix_history_keymap])
+    pkeymap = AnyDict(
+        'k' => (s::MIState,o...)->(edit_move_up(s) || enter_prefix_search(s, p, true)),
+        'j' => (s::MIState,o...)->(edit_move_down(s) || enter_prefix_search(s, p, false)),
+        # Up Arrow
+        "\e[A" => (s::MIState,o...)->(edit_move_up(s) || enter_prefix_search(s, p, true)),
+        # Down Arrow
+        "\e[B" => (s::MIState,o...)->(edit_move_down(s) || enter_prefix_search(s, p, false)),
+    )
+    return (p, pkeymap)
+end
+
+hp = julia_prompt.hist
+vi_prefix_prompt, prefix_keymap = setup_prefix_keymap_vi(hp, vim_prompt)
+#vi_prefix_prompt.keymap_dict['\r'] = (s::MIState,o...)->begin
+#            commit_line(s)
+#            end,
+#vi_prefix_prompt.keymap_dict['\r'] =  
+#prefix_keymap['k'] = prefix_keymap["^P"]
+#prefix_keymap['j'] = prefix_keymap["^N"]
+empty!(vim_prompt.keymap_dict)
+vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap]), vim_norm_nav_keymap)
 
 function REPL.history_move(
     s::Union{LineEdit.MIState,LineEdit.PrefixSearchState},
@@ -116,7 +172,7 @@ function REPL.history_move(
         hist.last_buffer = IOBuffer()
     else
         if haskey(hist.mode_mapping, hist.modes[idx])
-            if mode(s) == vim_prompt
+            if mode(s) == vim_prompt || s.parent == vim_prompt
                 LineEdit.replace_line(s, hist.history[idx]) #if vim prompt we stay in vim prompt dont change to julia_prompt on history
             else
                 LineEdit.transition(s, hist.mode_mapping[hist.modes[idx]]) do
@@ -131,3 +187,24 @@ function REPL.history_move(
 
     return :ok
 end
+
+#function enter_prefix_search(s::MIState, p::PrefixHistoryPrompt, backward::Bool)
+#    buf = copy(buffer(s))
+#    parent = mode(s)
+#
+#    transition(s, p) do
+#        pss = state(s,p)
+#        pss.parent = parent
+#        pss.histprompt.parent_prompt = parent
+#        pss.prefix = String(buf.data[1:position(buf)])
+#        copybuf!(pss.response_buffer, buf)
+#        pss.indent = state(s, parent).indent
+#        pss.mi = s
+#      end
+#    if backward
+#        history_prev_prefix(pss, pss.histprompt.hp, pss.prefix)
+#    else
+#        history_next_prefix(pss, pss.histprompt.hp, pss.prefix)
+#    end
+#    nothing
+#end
