@@ -19,8 +19,8 @@ This isn't a module yet.
 If you want to try this out , get `start.jl` and run it with (`include("start.jl")`) in the repl.
 `julia -i start.jl` will not work.
 
-Built on [RepLMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on 
-LineEdit.
+Built on [ReplMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on some
+functions from LineEdit and REPL.
 
 whats mapped ...
 
