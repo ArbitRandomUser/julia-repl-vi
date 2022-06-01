@@ -42,11 +42,12 @@ Prefix Search works too.<br>
 If a something exists in repl buffer it goes up and down history only showing line starting
 with that something. 
 
-This needs the active repl to function.~ I havent figured out how auto-run things immediatly after the REPL starts.
+This needs the active repl to function.
+~I havent figured out how auto-run things immediatly after the REPL starts.
 For now i have a function `viminit() = include(path/to/start.jl)"` inside my startup.jl and run `viminit` when after julia startup.~
 
 silly me ... ReplMaker.jl has instructions on how to do this.
-append this to your vimrc
+append this to your startup.jl
 ```
 viminit() = include("/path/to/start.jl")
 atreplinit() do repl
