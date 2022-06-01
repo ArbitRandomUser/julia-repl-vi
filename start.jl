@@ -1,3 +1,6 @@
+#let try/catch fail in the first line itelf if there is no active_repl
+julia_prompt = Base.active_repl.interface.modes[1]
+
 using ReplMaker
 import REPL
 import REPL.LineEdit
@@ -12,17 +15,7 @@ import REPL.LineEdit:TextInterface,keymap_data,match_input,accept_result,StringL
 #edit_move_up
 #import LineEdit: edit_move_up , mode , MIState, transition
 sss = nothing
-julia_prompt = Base.active_repl.interface.modes[1]
 
-norm_trigger_keymap = REPL.AnyDict("\e\e" => function (s::MIState, o...)
-    buf = copy(LineEdit.buffer(s))
-    LineEdit.transition(s, vim_prompt) do
-        LineEdit.state(s, vim_prompt).input_buffer = buf
-    end
-end)#add esc-esc to julia_prompt mode
-
-julia_prompt.keymap_dict =
-    LineEdit.keymap_merge(julia_prompt.keymap_dict, norm_trigger_keymap)
 
 
 vim_norm_nav_keymap = AnyDict([
@@ -86,15 +79,6 @@ vim_norm_nav_keymap = AnyDict([
     end,
 ])
 
-vim_prompt = initrepl(
-    (s) -> show(s),
-    prompt_text = "vi > ",
-    prompt_color = :light_green,
-    start_key = "\e\e",
-    mode_name = "vim_prompt",
-    keymap = Dict([]),
-    valid_input_checker= REPL.return_callback
-)
 
 vi_prefix_history_keymap = merge!(
     AnyDict(
@@ -189,16 +173,12 @@ function setup_prefix_keymap_vi(hp::HistoryProvider, parent_prompt::Prompt)
     return (p, pkeymap)
 end
 
-hp = julia_prompt.hist
-vi_prefix_prompt, prefix_keymap = setup_prefix_keymap_vi(hp, vim_prompt)
 #vi_prefix_prompt.keymap_dict['\r'] = (s::MIState,o...)->begin
 #            commit_line(s)
 #            end,
 #vi_prefix_prompt.keymap_dict['\r'] =  
 #prefix_keymap['k'] = prefix_keymap["^P"]
 #prefix_keymap['j'] = prefix_keymap["^N"]
-empty!(vim_prompt.keymap_dict)
-vim_prompt.keymap_dict = LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap])
 
 function REPL.history_move(
     s::Union{LineEdit.MIState,LineEdit.PrefixSearchState},
@@ -248,3 +228,30 @@ function REPL.history_move(
     hist.cur_idx = idx
     return :ok
 end
+
+vim_prompt = initrepl(
+    (s) -> show(s),
+    prompt_text = "vi > ",
+    prompt_color = :light_green,
+    start_key = "\e\e",
+    mode_name = "vim_prompt",
+    keymap = Dict([]),
+    valid_input_checker= REPL.return_callback
+)
+
+hp = julia_prompt.hist
+vi_prefix_prompt, prefix_keymap = setup_prefix_keymap_vi(hp, vim_prompt)
+
+empty!(vim_prompt.keymap_dict)
+vim_prompt.keymap_dict = LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap])
+
+
+norm_trigger_keymap = REPL.AnyDict("\e\e" => function (s::MIState, o...)
+    buf = copy(LineEdit.buffer(s))
+    LineEdit.transition(s, vim_prompt) do
+        LineEdit.state(s, vim_prompt).input_buffer = buf
+    end
+end)#add esc-esc to julia_prompt mode
+
+julia_prompt.keymap_dict =
+    LineEdit.keymap_merge(julia_prompt.keymap_dict, norm_trigger_keymap)
