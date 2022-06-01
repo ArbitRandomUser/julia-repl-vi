@@ -177,7 +177,6 @@ vi_prefix_history_keymap = merge!(
 
 function setup_prefix_keymap_vi(hp::HistoryProvider, parent_prompt::Prompt)
     p = PrefixHistoryPrompt(hp, parent_prompt)
-    @show propertynames(p)
     p.keymap_dict = LineEdit.keymap([vi_prefix_history_keymap])
     pkeymap = AnyDict(
         'k' => (s::MIState,o...)->(edit_move_up(s) || enter_prefix_search(s, p, true)),
