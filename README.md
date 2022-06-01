@@ -22,6 +22,22 @@ This isn't a package or module yet.If you want to try this out , get `start.jl` 
 Built on [ReplMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on some
 functions from LineEdit and REPL.
 
+This needs the active repl to function.
+~I havent figured out how auto-run things immediatly after the REPL starts.
+For now i have a function `viminit() = include(path/to/start.jl)"` inside my startup.jl and run `viminit` when after julia startup.~
+
+silly me ... ReplMaker.jl has instructions on how to do this.
+append this to your startup.jl
+```
+viminit() = include("/path/to/start.jl")
+atreplinit() do repl
+        try
+            @async viminit()
+        catch
+        end
+    end
+```
+
 ## Whats mapped
 
 `h,j,k,l` : navigation 
@@ -42,18 +58,3 @@ Prefix Search works too.<br>
 If a something exists in repl buffer it goes up and down history only showing line starting
 with that something. 
 
-This needs the active repl to function.
-~I havent figured out how auto-run things immediatly after the REPL starts.
-For now i have a function `viminit() = include(path/to/start.jl)"` inside my startup.jl and run `viminit` when after julia startup.~
-
-silly me ... ReplMaker.jl has instructions on how to do this.
-append this to your startup.jl
-```
-viminit() = include("/path/to/start.jl")
-atreplinit() do repl
-        try
-            @async viminit()
-        catch
-        end
-    end
-```
