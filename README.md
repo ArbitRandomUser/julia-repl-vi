@@ -37,5 +37,5 @@ functions from LineEdit and REPL.
 `j,k` scroll up and down as-though the lines in history were the lines in a vim buffer.
 
 Prefix Search works too.<br>
-If a `string` exists in repl buffer it goes up and down history only showing line starting
-with that `string`
+If a something exists in repl buffer it goes up and down history only showing line starting
+with that something
