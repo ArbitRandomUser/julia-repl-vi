@@ -1,28 +1,26 @@
 # julia-repl-vi
-vi like repl bindings for julia-repl
+Vi like repl bindings for julia-repl
 
 Very barebones emulation of vim, probably always will be ... but ateast you dont 
 have to ctl-p to go through history. 
 
 * You have to hit `esc` **twice** to get into vi mode 
 
-`h,j,k,l` work as expected.
-
+`h,j,k,l` work as expected.<br>
 `j,k` move through history as well as up and down through multi line code in the REPL. 
 Works only with default `julia` mode though when going through history. (if you go through
 history with `k` and encounter say `ls` which you typed out in `shell` mode. When you
 go hit `i` it will paste `ls` to `julia` mode and not `shell` mode)
 
-vims number prefix dont work `2de` will not delete run `de` twice.
+Vim's number prefix dont work `2de` will not delete run `de` twice.
 
-This isn't a module yet.
-If you want to try this out , get `start.jl` and run it with (`include("start.jl")`) in the repl.
+This isn't a module yet.If you want to try this out , get `start.jl` from this repo and run it with (`include("start.jl")`) in the repl.
 `julia -i start.jl` will not work.
 
 Built on [ReplMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on some
 functions from LineEdit and REPL.
 
-whats mapped ...
+## Whats mapped
 
 `h,j,k,l` : navigation 
 
@@ -34,11 +32,10 @@ whats mapped ...
 
 `i,a` : go back to julia-mode
 
-~`j,k` dont do prefix completions .~
+~`j,k` do not do prefix completions .~
 
-`j,k` scroll up and down asthough the lines in history were the lines in a vim buffer.
+`j,k` scroll up and down as-though the lines in history were the lines in a vim buffer.
 
-Prefix Search works too.
-
+Prefix Search works too.<br>
 If a `string` exists in repl buffer it goes up and down history only showing line starting
 with that `string`
