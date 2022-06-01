@@ -198,8 +198,7 @@ vi_prefix_prompt, prefix_keymap = setup_prefix_keymap_vi(hp, vim_prompt)
 #prefix_keymap['k'] = prefix_keymap["^P"]
 #prefix_keymap['j'] = prefix_keymap["^N"]
 empty!(vim_prompt.keymap_dict)
-vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap]), vim_norm_nav_keymap)
-vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap]), vim_norm_nav_keymap)
+vim_prompt.keymap_dict = LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap])
 
 function REPL.history_move(
     s::Union{LineEdit.MIState,LineEdit.PrefixSearchState},
