@@ -1,7 +1,8 @@
 # julia-repl-vi
 Vi like repl bindings for julia-repl
 
-Very barebones emulation of vim, probably always will be ... but some vimulation is better than no vimulation
+Very barebones emulation of vim, probably always will be ... 
+but some vimulation is better than being an emacsochist.
 
 * You have to hit `esc` **twice** to get into vi mode 
 
