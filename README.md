@@ -40,3 +40,6 @@ functions from LineEdit and REPL.
 Prefix Search works too.<br>
 If a something exists in repl buffer it goes up and down history only showing line starting
 with that something
+
+This needs the active repl to funciton. I havent figured out how auto-run things immediatly after the REPL starts.
+for now i use it have a function `viminit() = include(path/to/start.jl)"` inside my startup.jl and running `viminit` when after julia startup.
