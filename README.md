@@ -1,8 +1,7 @@
 # julia-repl-vi
 Vi like repl bindings for julia-repl
 
-Very barebones emulation of vim, probably always will be ... but ateast you dont 
-have to ctl-p to go through history. 
+Very barebones emulation of vim, probably always will be ... but some vimulation is better than no vimulation
 
 * You have to hit `esc` **twice** to get into vi mode 
 
