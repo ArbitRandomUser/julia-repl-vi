@@ -2,7 +2,8 @@
 Vi like repl bindings for julia-repl
 
 Very barebones emulation of vim, probably always will be ... 
-but some vimulation is better than being an emacsochist.
+
+_Some vimulation is better than being an emacsochist._
 
 * You have to hit `esc` **twice** to get into vi mode 
 
