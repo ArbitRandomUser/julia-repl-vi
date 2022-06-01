@@ -34,5 +34,11 @@ whats mapped ...
 
 `i,a` : go back to julia-mode
 
-`j,k` dont do prefix completions .
+~`j,k` dont do prefix completions .~
+
 `j,k` scroll up and down asthough the lines in history were the lines in a vim buffer.
+
+Prefix Search works too.
+
+If a `string` exists in repl buffer it goes up and down history only showing line starting
+with that `string`
