@@ -4,13 +4,14 @@ import REPL.LineEdit
 import Base
 #using REPL.LineEdit
 #import REPL.LineEdit : *
-import REPL.LineEdit:keymap,prefix_history_keymap,HistoryProvider,Prompt,prefix_history_keymap,setup_prefix_keymap,history_prev_prefix,history_next_prefix,copybuf!,state,buffer,PrefixHistoryPrompt,enter_prefix_search,ModeState, edit_werase,edit_delete_next_word,on_enter,edit_move_word_left,edit_move_word_right,edit_undo!,commit_line,edit_move_right,edit_move_left,edit_move_up,edit_kill_region, mode, MIState, transition,AnyDict
+import REPL.LineEdit:TextInterface,keymap_data,match_input,accept_result,StringLike,keymap,prefix_history_keymap,HistoryProvider,Prompt,prefix_history_keymap,setup_prefix_keymap,history_prev_prefix,history_next_prefix,copybuf!,state,buffer,PrefixHistoryPrompt,enter_prefix_search,ModeState, edit_werase,edit_delete_next_word,on_enter,edit_move_word_left,edit_move_word_right,edit_undo!,commit_line,edit_move_right,edit_move_left,edit_move_up,edit_move_down,edit_kill_region, mode, MIState, transition,AnyDict
 #LineEdit = REPL.LineEdit
 #mode = LineEdit.mode
 #MIState = LineEdit.MIState
 #transition = LineEdit.transition
 #edit_move_up
 #import LineEdit: edit_move_up , mode , MIState, transition
+sss = nothing
 julia_prompt = Base.active_repl.interface.modes[1]
 
 norm_trigger_keymap = REPL.AnyDict("\e\e" => function (s::MIState, o...)
@@ -61,6 +62,7 @@ vim_norm_nav_keymap = AnyDict([
     #    end,
     
     # on enter goto julia mode
+    # TODO , figure out a working way to run code when enter is hit.
     '\r' => function (s::MIState, o...)
         buf = copy(LineEdit.buffer(s))
         transition(s, julia_prompt) do
@@ -89,12 +91,12 @@ vim_prompt = initrepl(
     prompt_text = "vi > ",
     prompt_color = :light_green,
     start_key = "\e\e",
-    mode_name = "vim_mode",
+    mode_name = "vim_prompt",
     keymap = Dict([]),
     valid_input_checker= REPL.return_callback
 )
 
-const vi_prefix_history_keymap = merge!(
+vi_prefix_history_keymap = merge!(
     AnyDict(
         'k' => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
         'j' => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
@@ -102,10 +104,68 @@ const vi_prefix_history_keymap = merge!(
         "\e[A" => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
         # Down Arrow
         "\e[B" => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
-        # by default, pass through to the parent mode
-        # match escape sequences for pass through
+        '\r' => function (s::MIState, o...)
+                  buf = copy(LineEdit.buffer(s))
+                  transition(s, julia_prompt) do
+                      LineEdit.state(s, julia_prompt).input_buffer = buf
+                  end
+        end,
+        'i' => function (s::MIState, o...)
+        buf = copy(LineEdit.buffer(s))
+        transition(s, julia_prompt) do
+            LineEdit.state(s, julia_prompt).input_buffer = buf
+        end
+        end,
+        'a' => function (s::MIState, o...)
+        buf = copy(LineEdit.buffer(s))
+        transition(s, julia_prompt) do
+            LineEdit.state(s, julia_prompt).input_buffer = buf
+        end
+        end,
+        'h'  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_move_left(s)
+        end,
+        'l'  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_move_right(s)
+        end,
+        "dd"  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,"")
+            LineEdit.refresh_line(s)
+            #LineEdit.edit_kill_region(s)
+        end,
+        "de"  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_delete_next_word(s)
+        end,
+        "db"  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_werase(s)
+        end,
+        'b'  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_move_word_left(s)
+        end,
+        'e'  => (s::MIState,data::ModeState,c::StringLike)->begin
+            sbuf = LineEdit.buffer(s)
+            transition(s,vim_prompt)
+            LineEdit.replace_line(s,sbuf)
+            LineEdit.edit_move_word_right(s)
+        end,
     ),
-    vim_norm_nav_keymap,
     # VT220 editing commands
     #AnyDict("\e[$(n)~" => "*" for n in 1:8),
     ## set mode commands
@@ -113,8 +173,11 @@ const vi_prefix_history_keymap = merge!(
     ## reset mode commands
     #AnyDict("\e[$(c)l" => "*" for c in 1:20)
 )
+
+
 function setup_prefix_keymap_vi(hp::HistoryProvider, parent_prompt::Prompt)
     p = PrefixHistoryPrompt(hp, parent_prompt)
+    @show propertynames(p)
     p.keymap_dict = LineEdit.keymap([vi_prefix_history_keymap])
     pkeymap = AnyDict(
         'k' => (s::MIState,o...)->(edit_move_up(s) || enter_prefix_search(s, p, true)),
@@ -136,6 +199,7 @@ vi_prefix_prompt, prefix_keymap = setup_prefix_keymap_vi(hp, vim_prompt)
 #prefix_keymap['k'] = prefix_keymap["^P"]
 #prefix_keymap['j'] = prefix_keymap["^N"]
 empty!(vim_prompt.keymap_dict)
+vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap]), vim_norm_nav_keymap)
 vim_prompt.keymap_dict = LineEdit.keymap_merge(LineEdit.keymap([vim_norm_nav_keymap,prefix_keymap]), vim_norm_nav_keymap)
 
 function REPL.history_move(
@@ -184,27 +248,5 @@ function REPL.history_move(
         end
     end
     hist.cur_idx = idx
-
     return :ok
 end
-
-#function enter_prefix_search(s::MIState, p::PrefixHistoryPrompt, backward::Bool)
-#    buf = copy(buffer(s))
-#    parent = mode(s)
-#
-#    transition(s, p) do
-#        pss = state(s,p)
-#        pss.parent = parent
-#        pss.histprompt.parent_prompt = parent
-#        pss.prefix = String(buf.data[1:position(buf)])
-#        copybuf!(pss.response_buffer, buf)
-#        pss.indent = state(s, parent).indent
-#        pss.mi = s
-#      end
-#    if backward
-#        history_prev_prefix(pss, pss.histprompt.hp, pss.prefix)
-#    else
-#        history_next_prefix(pss, pss.histprompt.hp, pss.prefix)
-#    end
-#    nothing
-#end
