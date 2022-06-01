@@ -15,7 +15,8 @@ go hit `i` it will paste `ls` to `julia` mode and not `shell` mode)
 
 Vim's number prefix dont work `2de` will not delete run `de` twice.
 
-This isn't a module yet.If you want to try this out , get `start.jl` from this repo and run it with (`include("start.jl")`) in the repl.
+## Install
+This isn't a package or module yet.If you want to try this out , get `start.jl` from this repo and run it with (`include("start.jl")`) in the repl.
 `julia -i start.jl` will not work.
 
 Built on [ReplMaker.jl](https://github.com/MasonProtter/ReplMaker.jl) and a minor tweak on some
