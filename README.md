@@ -1,11 +1,11 @@
 # julia-repl-vi
-Vi like repl bindings for julia-repl
-
+Vi like bindings for julia-repl<br>
 Very barebones emulation of vim, probably always will be ... 
 
 _Some vimulation is better than being an emacsochist._
 
-* You have to hit `esc` **twice** to get into vi mode 
+
+##### NOTE : You have to hit `esc` **twice** to get into vi mode 
 
 `h,j,k,l` work as expected.<br>
 `j,k` move through history as well as up and down through multi line code in the REPL. 
