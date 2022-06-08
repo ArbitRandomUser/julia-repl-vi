@@ -98,8 +98,8 @@ end
 
 
 vi_prefix_history_keymap = AnyDict(
-        "k" => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
-        "j" => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
+        "k" => (s::MIState,data::ModeState,c)-> edit_move_up(s) || history_prev_prefix(data, data.histprompt.hp, data.prefix),
+        "j" => (s::MIState,data::ModeState,c)-> edit_move_down(s) || history_next_prefix(data, data.histprompt.hp, data.prefix),
         # Up Arrow
         "\e[A" => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
         # Down Arrow
