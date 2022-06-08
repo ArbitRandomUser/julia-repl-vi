@@ -56,12 +56,17 @@ vim_norm_nav_keymap = AnyDict([
     
     # on enter goto julia mode
     # TODO , figure out a working way to run code when enter is hit.
-    '\r' => function (s::MIState, o...)
-        buf = copy(LineEdit.buffer(s))
-        transition(s, julia_prompt) do
-            LineEdit.state(s, julia_prompt).input_buffer = buf
-        end
-        end,
+    #'\r' => function (s::MIState, o...)
+    #    buf = copy(LineEdit.buffer(s))
+    #    transition(s, julia_prompt) do
+    #        LineEdit.state(s, julia_prompt).input_buffer = buf
+    #    end
+    #    end,
+    '\r' => (s::MIState, o...) -> begin
+                transition(s,julia_prompt)
+                commit_line(s)
+                return :done
+            end,
 
     #back to julia_prompt
     "i" => function (s::MIState, o...)
@@ -105,10 +110,14 @@ vi_prefix_history_keymap = AnyDict(
         # Down Arrow
         "\e[B" => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
         '\r' => function (s::MIState, o...)
-                  buf = copy(LineEdit.buffer(s))
-                  transition(s, julia_prompt) do
+                  sbuf = copy(LineEdit.buffer(s))
+                  transition(s, julia_prompt) #do
+                  LineEdit.replace_line(s,sbuf)
+                  commit_line(s)
+                  return :done
+
                       LineEdit.state(s, julia_prompt).input_buffer = buf
-                  end
+                  #end
         end,
         "i" => function (s::MIState, o...)
         buf = copy(LineEdit.buffer(s))
