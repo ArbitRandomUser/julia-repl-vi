@@ -30,7 +30,7 @@ vim_norm_nav_keymap = AnyDict([
     "h" => (s::MIState,o...)->edit_move_left(s),
     "l" => (s::MIState,o...)->edit_move_right(s),
     #delete line
-    "dd" => (s::MIState,o...)->edit_kill_region(s),
+    "dd" => (s::MIState,o...)->(LineEdit.replace_line(s,"");LineEdit.refresh_line(s)),
     #word erase
     "de" => (s::MIState,o...)->edit_delete_next_word(s),
     "db" => (s::MIState,o...)->edit_werase(s),
@@ -109,23 +109,21 @@ vi_prefix_history_keymap = AnyDict(
         "\e[A" => (s::MIState,data::ModeState,c)->history_prev_prefix(data, data.histprompt.hp, data.prefix),
         # Down Arrow
         "\e[B" => (s::MIState,data::ModeState,c)->history_next_prefix(data, data.histprompt.hp, data.prefix),
-        '\r' => function (s::MIState, o...)
+        '\r' => (s::MIState, o...) -> begin
                   sbuf = copy(LineEdit.buffer(s))
-                  transition(s, julia_prompt) #do
+                  transition(s, julia_prompt) 
                   LineEdit.replace_line(s,sbuf)
                   commit_line(s)
                   return :done
-
                       LineEdit.state(s, julia_prompt).input_buffer = buf
-                  #end
+                end,
+        "i" => (s::MIState, o...) -> begin
+                    buf = copy(LineEdit.buffer(s))
+                    transition(s, julia_prompt) do
+                    LineEdit.state(s, julia_prompt).input_buffer = buf
+                    end
         end,
-        "i" => function (s::MIState, o...)
-        buf = copy(LineEdit.buffer(s))
-        transition(s, julia_prompt) do
-            LineEdit.state(s, julia_prompt).input_buffer = buf
-        end
-        end,
-        "a" => function (s::MIState, o...)
+        "a" => (s::MIState, o...) -> begin
         buf = copy(LineEdit.buffer(s))
         transition(s, julia_prompt) do
             LineEdit.state(s, julia_prompt).input_buffer = buf

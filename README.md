@@ -56,6 +56,8 @@ atreplinit() do repl
 
 `j,k` scroll up and down as-though the lines in history were the lines in a vim buffer.
 
+`Enter` runs the line on the REPL buffer and sets the mode to julia mode.
+
 Prefix Search works too.<br>
 If a something exists in repl buffer it goes up and down history only showing line starting
 with that something. 
