@@ -50,6 +50,8 @@ atreplinit() do repl
 
 `i,a` : go back to julia-mode
 
+`x` : deletes a character
+
 ~`j,k` do not do prefix completions .~
 
 `j,k` scroll up and down as-though the lines in history were the lines in a vim buffer.
@@ -58,3 +60,4 @@ Prefix Search works too.<br>
 If a something exists in repl buffer it goes up and down history only showing line starting
 with that something. 
 
+I dont understand a lot of the code in REPL.jl and LineEdit.jl myself. So somethings you see in my code  might be a roundabout way to do things because i'm not aware of or dont fully understand the functions in REPL.jl and LineEdit.jl. Some day when i have the time i'll get around to writing a cleaner version of this. For now i get it to a point of working for my use. 
