@@ -1,3 +1,6 @@
+# Better package 
+https://github.com/caleb-allen/VimBindings.jl is more complete, much more advanced and way ahead in vim emulation. I wont be working on this package anymore.
+
 # julia-repl-vi
 Vi like bindings for julia-repl<br>
 Very barebones emulation of vim, probably always will be ... 
